@@ -1,6 +1,6 @@
 /**
  * Author: Maxwell Crawford
- * Date changed: 4-24-17 9:53pm
+ * Date changed: 4-24-17 9:18pm
  * Set of SQL tests, to Azure, from Java/JDBC
  */
 
@@ -208,7 +208,7 @@ public class App {
                 String test2SQLc_sel = "SELECT * FROM [dbo].[Player]";
                 
                 connection = DriverManager.getConnection(connectionString); //for testdb
-                System.out.println("\n\n\t -- Test 2: Insert INTO");
+                System.out.println("\n\t -- Test 2: Insert INTO");
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
@@ -220,7 +220,7 @@ public class App {
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
+                        connection.close();
                         exstatement.close();
 //                        resultSet.close();
                 }
@@ -278,14 +278,12 @@ public class App {
                  */
                 String test3SQLa = "UPDATE [dbo].[DungeonMaster]"
                 		+ " SET [Game_IDs] = '4,5,6'"
-                		+ " WHERE [Game_IDs] = '1,2,3';";
+                		+ " WHERE [Game_IDs] '1,2,3';";
                 
-                System.out.println("\n\n\t -- Test 3: Update");
+                System.out.println("\n\t -- Test 3: Update");
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                
-                connection = DriverManager.getConnection(connectionString); //for testdb
                 exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
                 exstatement.execute(test3SQLa);
                 try
@@ -294,7 +292,7 @@ public class App {
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
+                        connection.close();
                         exstatement.close();
 //                        resultSet.close();
                 }
@@ -340,10 +338,6 @@ public class App {
                             e.printStackTrace();
                     }
                 
-                System.out.println("\n\n\t* Waiting for input and ENTER... *");
-                s = scan.next();
-                System.out.println("====================================");
-                
                 /**
                  * Test 4: Delete existing row from tables
                  * a) Player
@@ -351,15 +345,14 @@ public class App {
                  * c) DungeonMaster
                  */
                 String test4SQLa = "DELETE FROM [dbo].[DungeonMaster] "
-                		+ "WHERE [Game_IDs] = '4,5,6'";
+                		+ "WHERE Game_IDs='4,5,6'";
                 //SQLa_sel
                 
-                System.out.println("\n\n\t -- Test 4: Delete");
+                System.out.println("\n\t -- Test 4: Delete");
                 
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                connection = DriverManager.getConnection(connectionString); //for testdb
                 exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
                 exstatement.execute(test4SQLa);
                 try
@@ -368,7 +361,7 @@ public class App {
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
+                        connection.close();
                         exstatement.close();
 //                        resultSet.close();
                 }
@@ -414,6 +407,7 @@ public class App {
                             e.printStackTrace();
                     }
                 
+//                connection.close();
                 
             }
         catch (Exception e) 

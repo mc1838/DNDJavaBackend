@@ -1,6 +1,6 @@
 /**
  * Author: Maxwell Crawford
- * Date changed: 4-24-17 9:53pm
+ * Date changed: 4-24-17 2:05pm
  * Set of SQL tests, to Azure, from Java/JDBC
  */
 
@@ -208,21 +208,18 @@ public class App {
                 String test2SQLc_sel = "SELECT * FROM [dbo].[Player]";
                 
                 connection = DriverManager.getConnection(connectionString); //for testdb
-                System.out.println("\n\n\t -- Test 2: Insert INTO");
+                System.out.println("\n\t -- Test 1: Insert INTO");
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                Statement exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
-                exstatement.execute(test2SQLa);
-                try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test2SQLa)) 
+                try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(test2SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
-                        exstatement.close();
-//                        resultSet.close();
+                        connection.close();
+                        statement.close();
+                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -278,25 +275,20 @@ public class App {
                  */
                 String test3SQLa = "UPDATE [dbo].[DungeonMaster]"
                 		+ " SET [Game_IDs] = '4,5,6'"
-                		+ " WHERE [Game_IDs] = '1,2,3';";
+                		+ " WHERE [Game_IDs] '1,2,3';";
                 
-                System.out.println("\n\n\t -- Test 3: Update");
+                System.out.println("\n\t -- Test 3: Update");
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                
-                connection = DriverManager.getConnection(connectionString); //for testdb
-                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
-                exstatement.execute(test3SQLa);
-                try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test3SQLa)) 
+                try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(test3SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
-                        exstatement.close();
-//                        resultSet.close();
+                        connection.close();
+                        statement.close();
+                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -340,10 +332,6 @@ public class App {
                             e.printStackTrace();
                     }
                 
-                System.out.println("\n\n\t* Waiting for input and ENTER... *");
-                s = scan.next();
-                System.out.println("====================================");
-                
                 /**
                  * Test 4: Delete existing row from tables
                  * a) Player
@@ -351,26 +339,22 @@ public class App {
                  * c) DungeonMaster
                  */
                 String test4SQLa = "DELETE FROM [dbo].[DungeonMaster] "
-                		+ "WHERE [Game_IDs] = '4,5,6'";
+                		+ "WHERE Game_IDs='1,2,3'";
                 //SQLa_sel
                 
-                System.out.println("\n\n\t -- Test 4: Delete");
+                System.out.println("\n\t -- Test 4: Delete");
                 
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                connection = DriverManager.getConnection(connectionString); //for testdb
-                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
-                exstatement.execute(test4SQLa);
-                try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test4SQLa)) 
+                try (Statement statement = connection.createStatement();
+                    ResultSet resultSet = statement.executeQuery(test4SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                         
-//                        connection.close();
-                        exstatement.close();
-//                        resultSet.close();
+                        connection.close();
+                        statement.close();
+                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -414,6 +398,45 @@ public class App {
                             e.printStackTrace();
                     }
                 
+                
+                /**
+                 * TRY 2: Perform action with DB, using tests
+                 */
+//                try (Statement statement = connection.createStatement();
+//                    ResultSet resultSet = statement.executeQuery(selectSql2)) 
+//                {
+//                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+//                		
+//                        // Print results from SQL statement
+//                        System.out.println("Select Stmt Result:");
+//                        ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+//                        int columns = rsmd.getColumnCount();
+//                        String columnNames = "";
+//                        for (int i=1; i<=columns; i++)
+//                        {
+//                        	columnNames += rsmd.getColumnLabel(i) + "\t";
+//                        }
+//                        
+//                        System.out.println(columnNames);
+//                        System.out.println("==================================================================================");
+//                        while (resultSet.next())
+//                        {
+//                        	for (int i=1; i<=columns; i++)
+//                        	{
+//                        		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+//                        	}
+//                        	
+//                        }
+//                        
+//                        connection.close();
+//                        statement.close();
+//                        resultSet.close();
+//                }
+//                
+//                catch (Exception e) 
+//                {
+//                        e.printStackTrace();
+//                }
                 
             }
         catch (Exception e) 
