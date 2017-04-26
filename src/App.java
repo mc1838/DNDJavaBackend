@@ -1,6 +1,6 @@
 /**
  * Author: Maxwell Crawford
- * Date changed: 4-24-17 9:53pm
+ * Date changed: 4-25-17 9:03pm
  * Set of SQL tests, to Azure, from Java/JDBC
  */
 
@@ -18,10 +18,6 @@ public class App {
     public static void main(String[] args) {
 
         // Connect to database
-        String hostName = "csc450.database.windows.net";
-        String dbName = "testdb";
-        String user = "mc1838";
-        String password = "Project450";
         String connectionString = 
         		"jdbc:sqlserver://csc450.database.windows.net:1433;" + 
         		"database=testdb;" + 
@@ -59,6 +55,7 @@ public class App {
                 String test1SQL2 = "SELECT * FROM [dbo].[PlayerTest]";
                 
                 System.out.println("\n\t -- Test 1: Select ALL");
+                
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
@@ -175,7 +172,7 @@ public class App {
                 		+ " ,'(1,0),(5,1)'"
                 		+ " ,0"
                 		+ " ,'There are no rules!')";
-                String test2SQLb_sel = "SELECT * FROM [dbo].[Game]";
+                String SQLb_sel = "SELECT * FROM [dbo].[Game]";
                 
                 String test2SQLc = "INSERT INTO [dbo].[Player]"
                 		+ " ([Game_ID]"
@@ -185,18 +182,18 @@ public class App {
                 		+ " ,[Mana]"
                 		+ " ,[Dexterity]"
                 		+ " ,[Intelligence]"
-                		+ " ,[Agility])"
+                		+ " ,[Agility]"
                 		+ " ,[Defense]"
                 		+ " ,[Inventory]"
                 		+ " ,[Successes]"
                 		+ " ,[Fails]"
-                		+ " ,[Score]"
+                		+ " ,[Score])"
                 		+ " VALUES "
                 		+ "(1"
                 		+ " ,'Thargoid'"
                 		+ " ,'Warrior'"
-                		+ " ,1250"
-                		+ " ,900"
+                		+ " ,'(1250,1250)'"
+                		+ " ,'(900,1000)'"
                 		+ " ,25"
                 		+ " ,5"
                 		+ " ,7"
@@ -205,24 +202,21 @@ public class App {
                 		+ " ,5"
                 		+ " ,7"
                 		+ " ,0)";
-                String test2SQLc_sel = "SELECT * FROM [dbo].[Player]";
+                String SQLc_sel = "SELECT * FROM [dbo].[Player]";
                 
-                connection = DriverManager.getConnection(connectionString); //for testdb
+                
                 System.out.println("\n\n\t -- Test 2: Insert INTO");
                 /**
                  * TRY 2: Perform action with DB, using tests
                  */
-                Statement exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
+                
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                Statement exstatement = connection.createStatement(); //NOTE: need execute type stmt for non-selects
                 exstatement.execute(test2SQLa);
                 try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test2SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                        
-//                        connection.close();
                         exstatement.close();
-//                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -270,15 +264,132 @@ public class App {
                 s = scan.next();
                 System.out.println("====================================");
                 
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: need execute type stmt for non-selects
+                exstatement.execute(test2SQLb);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLb_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Insert Stmt Result - Game Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
+                
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: need execute type stmt for non-selects
+                exstatement.execute(test2SQLc);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLc_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Insert Stmt Result - Player Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
+                
                 /**
                  * Test 3: Update existing row in tables
                  * a) Player
                  * b) Game
                  * c) DungeonMaster
                  */
+                
                 String test3SQLa = "UPDATE [dbo].[DungeonMaster]"
                 		+ " SET [Game_IDs] = '4,5,6'"
                 		+ " WHERE [Game_IDs] = '1,2,3';";
+                
+                String test3SQLb = "UPDATE [dbo].[Game]"
+                		+ " SET [Player_IDs] = '1,4,5,6', [PlayerCount] = 4"
+                		+ " WHERE [Player_IDs] = '1,2,3';";
+                
+                String test3SQLc = "UPDATE [dbo].[Player]"
+                		+ " SET [Health] = '(400,1250)', [Successes] = 101"
+                		+ " WHERE [Successes] = 5;";
                 
                 System.out.println("\n\n\t -- Test 3: Update");
                 /**
@@ -289,14 +400,9 @@ public class App {
                 exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
                 exstatement.execute(test3SQLa);
                 try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test3SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                        
-//                        connection.close();
                         exstatement.close();
-//                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -344,6 +450,114 @@ public class App {
                 s = scan.next();
                 System.out.println("====================================");
                 
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
+                exstatement.execute(test3SQLb);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLb_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Update Stmt Result - Game Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
+                
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
+                exstatement.execute(test3SQLc);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLc_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Update Stmt Result - Player Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
+                
                 /**
                  * Test 4: Delete existing row from tables
                  * a) Player
@@ -352,6 +566,13 @@ public class App {
                  */
                 String test4SQLa = "DELETE FROM [dbo].[DungeonMaster] "
                 		+ "WHERE [Game_IDs] = '4,5,6'";
+                
+                String test4SQLb = "DELETE FROM [dbo].[Game] "
+                		+ "WHERE [Player_IDs] = '1,4,5,6'";
+                
+                String test4SQLc = "DELETE FROM [dbo].[Player] "
+                		+ "WHERE [Successes] = 101";
+                
                 //SQLa_sel
                 
                 System.out.println("\n\n\t -- Test 4: Delete");
@@ -363,14 +584,9 @@ public class App {
                 exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
                 exstatement.execute(test4SQLa);
                 try
-//                try (Statement statement = connection.createStatement();
-//                    ResultSet resultSet = statement.executeQuery(test4SQLa)) 
                 {
                 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                        
-//                        connection.close();
                         exstatement.close();
-//                        resultSet.close();
                 }
                 
                 catch (Exception e) 
@@ -414,7 +630,115 @@ public class App {
                             e.printStackTrace();
                     }
                 
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
                 
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
+                exstatement.execute(test4SQLb);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLb_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Delete Stmt Result - Game Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                System.out.println("\n\n\t* Waiting for input and ENTER... *");
+                s = scan.next();
+                System.out.println("====================================");
+                
+                connection = DriverManager.getConnection(connectionString); //for testdb
+                exstatement = connection.createStatement(); //NOTE: may need execute type stmt for non-selects
+                exstatement.execute(test4SQLc);
+                try
+                {
+                		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                        exstatement.close();
+                }
+                
+                catch (Exception e) 
+                {
+                        e.printStackTrace();
+                }
+                
+                try (Statement statement = connection.createStatement();
+                        ResultSet resultSet = statement.executeQuery(SQLc_sel)) 
+                    {
+                    		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+                    		
+                            // Print results from SQL statement
+                            System.out.println("Delete Stmt Result - Player Table:");
+                            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+                            int columns = rsmd.getColumnCount();
+                            String columnNames = "";
+                            for (int i=1; i<=columns; i++)
+                            {
+                            	columnNames += rsmd.getColumnLabel(i) + "\t";
+                            }
+                            
+                            System.out.println(columnNames);
+                            System.out.println("==================================================================================");
+                            while (resultSet.next())
+                            {
+                            	for (int i=1; i<=columns; i++)
+                            	{
+                            		System.out.print(resultSet.getString(i) + "\t"); //each col. item, tabbed
+                            	}
+                            	
+                            }
+                            
+                            connection.close();
+                            statement.close();
+                            resultSet.close();
+                    }
+                    
+                    catch (Exception e) 
+                    {
+                            e.printStackTrace();
+                    }
+                
+                scan.close();
             }
         catch (Exception e) 
         {
