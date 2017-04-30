@@ -1,17 +1,15 @@
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.DriverManager;
-
-import android.util.Log;
-import android.widget.Toast;
 
 /**
  * @author Maxwell Crawford
  * Connect module for Java/JDBC to MSSQL backend.
  * Has support for basic executeQuery/execute statements.
- * ANDROID/JTDS version!
+ * DESKTOP JAVA version!
  */
 public class Connect 
 {
@@ -20,7 +18,9 @@ public class Connect
 	 */
 	String connectionString = "";
 	Connection connection = null;
-
+//	String countQuery = "SELECT COUNT(*) FROM";
+	
+	
 	/**
 	 * Constructor, which sets up the connectionstring
 	 * to use. Can be re-set again later.
@@ -30,35 +30,31 @@ public class Connect
 		super();
 		this.connectionString = connectionString;
 	}
-	
+
 	/**
 	 * connectSelect - used for Select statements and 
 	 * queries which return some 'ResultSet'.
 	 * 
 	 * Can use the ResultSet to retrieve and store data!
 	 * @param SQLQuery - the specified SQL Select statement
+	 * @param tableName - the current table name, used for count of rows
 	 */
 	public ArrayList<String[]> connectSelect(String SQLQuery)
 	{
-		// Allow all forms of Networking threading
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        ArrayList<String[]> result = new ArrayList<String[]>();
-
+		ArrayList<String[]> result = new ArrayList<String[]>();
+		
 		// 1) Establish initial connection
 		try
 		{
-			Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			connection = DriverManager.getConnection(connectionString);
 		}
 
 		catch (Exception e)
 		{
-			Log.w("Error with connection: ", e.getMessage());
-            Toast.makeText(this, "getC "+ e.getMessage(), Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
 		}
-
+		
 		// 2) Grab results from DB and store in 2D array
 		try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SQLQuery))
@@ -83,10 +79,9 @@ public class Connect
 
         catch (Exception e)
 		{
-			Log.w("Error with connection: ", e.getMessage());
-            Toast.makeText(this, "exec " + e.getMessage(), Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
 		}
-
+		
 		return result;
 	}
 	
@@ -98,20 +93,15 @@ public class Connect
 	 */
 	public void connectExecute(String SQLQuery)
 	{
-		// Allow all forms of Networking threading
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
 		try
 		{
-			Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			connection = DriverManager.getConnection(connectionString);
 		}
 
 		catch (Exception e)
 		{
-			Log.w("Error with connection: ", e.getMessage());
-            Toast.makeText(this, "getC "+ e.getMessage(), Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
 		}
 
 		try (Statement exstatement = connection.createStatement())
@@ -124,11 +114,10 @@ public class Connect
 		
 		catch (Exception e)
 		{
-			Log.w("Error with connection: ", e.getMessage());
-            Toast.makeText(this, "getC "+ e.getMessage(), Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * login - Parses int from Player ID string,
 	 * checks DB IDs, and compares given ID to existing set.
@@ -153,6 +142,7 @@ public class Connect
           {
         	isValid = false;
         	return isValid;
+//        	e.printStackTrace();
           }
           
           // Was valid number
@@ -215,61 +205,6 @@ public class Connect
 	}
 
 	/**
-	 * getReport - gets nicely formatted report of Player's
-	 * game statistics and score.
-	 * Player_ID can be int OR string, as long as it is valid.
-	 * @param Player_ID - ID number which is matched to row in Player table
-	 * @return report - the pre-formatted report, as one string.
-	 */
-	public String getReport(int Player_ID)
-	{
-		String reportQuery = "SELECT * FROM [dbo].[Player] WHERE Player_ID=" + Player_ID;
-        ArrayList<String[]> result = this.connectSelect(reportQuery);
-        int rowsize = result.get(0).length;
-        String[] row = new String[rowsize];
-        for (int i=0; i<rowsize; i++)
-        {
-        	row[i] = result.get(0)[i]; //0th index since Player_ID has only 1 char.
-        }
-        
-        String report = "Report for Player:\n================================================\n";
-        report += "Player_ID = " + row[0] + "\t";
-        report += "Game_ID = " + row[1] + "\n";
-        report += "You are " + row[2] + " the " + row[3] + ",\n";
-        report += " with " + row[4] + " Health and " + row[5] + " Mana.\n";
-        report += "Dexterity: " + row[6] + " , Intelligence: " + row[7] + "\n";
-        report += "Agility: " + row[8] + " , Defense: " + row[9] + "\n";
-        report += "Current Inventory: " + row[10] + "\n";
-        report += "# of Successes = " + row[11] + ", # of Fails = " + row[12] + "\n";
-        report += "Total Score = " + row[13];
-        return report;
-	}
-	
-	public String getReport(String Player_ID)
-	{
-		String reportQuery = "SELECT * FROM [dbo].[Player] WHERE Player_ID=" + Player_ID;
-        ArrayList<String[]> result = this.connectSelect(reportQuery);
-        int rowsize = result.get(0).length;
-        String[] row = new String[rowsize];
-        for (int i=0; i<rowsize; i++)
-        {
-        	row[i] = result.get(0)[i]; //0th index since Player_ID has only 1 char.
-        }
-        
-        String report = "Report for Player:\n================================================\n";
-        report += "Player_ID = " + row[0] + "\t";
-        report += "Game_ID = " + row[1] + "\n";
-        report += "You are " + row[2] + " the " + row[3] + ",\n";
-        report += " with " + row[4] + " Health and " + row[5] + " Mana.\n";
-        report += "Dexterity: " + row[6] + " , Intelligence: " + row[7] + "\n";
-        report += "Agility: " + row[8] + " , Defense: " + row[9] + "\n";
-        report += "Current Inventory: " + row[10] + "\n";
-        report += "# of Successes = " + row[11] + ", # of Fails = " + row[12] + "\n";
-        report += "Total Score = " + row[13];
-        return report;
-	}
-
-	/**
 	 * @return the connectionString
 	 */
 	public String getConnectionString() {
@@ -295,7 +230,7 @@ public class Connect
 		String strresult[] = inputstr.get(index);		
 		return strresult;
 	}
-
+	
 	/**
 	 * getStringAtIndex - using the given String array and index number,
 	 * return the string at the index.

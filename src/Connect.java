@@ -142,7 +142,6 @@ public class Connect
           {
         	isValid = false;
         	return isValid;
-//        	e.printStackTrace();
           }
           
           // Was valid number
@@ -202,6 +201,61 @@ public class Connect
         // Grab only the last ID:
         int lastID = this.parseIntsFromResult(currentIDs[currentIDs.length-1])[0];
         return lastID;
+	}
+	
+	/**
+	 * getReport - gets nicely formatted report of Player's
+	 * game statistics and score.
+	 * Player_ID can be int OR string, as long as it is valid.
+	 * @param Player_ID - ID number which is matched to row in Player table
+	 * @return report - the pre-formatted report, as one string.
+	 */
+	public String getReport(int Player_ID)
+	{
+		String reportQuery = "SELECT * FROM [dbo].[Player] WHERE Player_ID=" + Player_ID;
+        ArrayList<String[]> result = this.connectSelect(reportQuery);
+        int rowsize = result.get(0).length;
+        String[] row = new String[rowsize];
+        for (int i=0; i<rowsize; i++)
+        {
+        	row[i] = result.get(0)[i]; //0th index since Player_ID has only 1 char.
+        }
+        
+        String report = "Report for Player:\n================================================\n";
+        report += "Player_ID = " + row[0] + "\t";
+        report += "Game_ID = " + row[1] + "\n";
+        report += "You are " + row[2] + " the " + row[3] + ",\n";
+        report += " with " + row[4] + " Health and " + row[5] + " Mana.\n";
+        report += "Dexterity: " + row[6] + " , Intelligence: " + row[7] + "\n";
+        report += "Agility: " + row[8] + " , Defense: " + row[9] + "\n";
+        report += "Current Inventory: " + row[10] + "\n";
+        report += "# of Successes = " + row[11] + ", # of Fails = " + row[12] + "\n";
+        report += "Total Score = " + row[13];
+        return report;
+	}
+	
+	public String getReport(String Player_ID)
+	{
+		String reportQuery = "SELECT * FROM [dbo].[Player] WHERE Player_ID=" + Player_ID;
+        ArrayList<String[]> result = this.connectSelect(reportQuery);
+        int rowsize = result.get(0).length;
+        String[] row = new String[rowsize];
+        for (int i=0; i<rowsize; i++)
+        {
+        	row[i] = result.get(0)[i]; //0th index since Player_ID has only 1 char.
+        }
+        
+        String report = "Report for Player:\n================================================\n";
+        report += "Player_ID = " + row[0] + "\t";
+        report += "Game_ID = " + row[1] + "\n";
+        report += "You are " + row[2] + " the " + row[3] + ",\n";
+        report += " with " + row[4] + " Health and " + row[5] + " Mana.\n";
+        report += "Dexterity: " + row[6] + " , Intelligence: " + row[7] + "\n";
+        report += "Agility: " + row[8] + " , Defense: " + row[9] + "\n";
+        report += "Current Inventory: " + row[10] + "\n";
+        report += "# of Successes = " + row[11] + ", # of Fails = " + row[12] + "\n";
+        report += "Total Score = " + row[13];
+        return report;
 	}
 
 	/**
