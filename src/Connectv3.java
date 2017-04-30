@@ -1,6 +1,5 @@
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.DriverManager;
@@ -18,32 +17,17 @@ public class Connect
 	 */
 	String connectionString = "";
 	Connection connection = null;
-//	String countQuery = "SELECT COUNT(*) FROM";
 	
-	
-	/**
-	 * Constructor, which sets up the connectionstring
-	 * to use. Can be re-set again later.
-	 * @param connectionString - the string which determines which server/db to use and how
-	 */
-	public Connect(String connectionString) {
-		super();
-		this.connectionString = connectionString;
-	}
-
 	/**
 	 * connectSelect - used for Select statements and 
 	 * queries which return some 'ResultSet'.
 	 * 
 	 * Can use the ResultSet to retrieve and store data!
 	 * @param SQLQuery - the specified SQL Select statement
-	 * @param tableName - the current table name, used for count of rows
 	 */
-	public ArrayList<String[]> connectSelect(String SQLQuery)
+	public String[] connectSelect(String SQLQuery)
 	{
-		ArrayList<String[]> result = new ArrayList<String[]>();
-		
-		// 1) Establish initial connection
+		String[] arr = null;
 		try
 		{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -54,22 +38,21 @@ public class Connect
 		{
 			e.printStackTrace();
 		}
-		
-		// 2) Grab results from DB and store in 2D array
+
 		try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SQLQuery))
         {
             ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
             int columns = rsmd.getColumnCount();
+            arr = new String[columns];
 
             while (resultSet.next())
             {
-            	String[] row = new String[columns];
-            	for (int i=1; i<=columns; i++)
-            	{
-            		row[i-1] = resultSet.getString(i);
-            	}
-            	result.add(row);
+                for (int i=1; i<=columns; i++)
+                {
+                	arr[i-1] = resultSet.getString(i); //store each item as elem, offset-1 because columns start at 1
+                }
+
             }
 
             connection.close();
@@ -82,7 +65,7 @@ public class Connect
 			e.printStackTrace();
 		}
 		
-		return result;
+		return arr;
 	}
 	
 	/**
@@ -132,19 +115,6 @@ public class Connect
 		this.connectionString = connectionString;
 	}
 
-	/**
-	 * getStringAtIndex - using the given String array and index number,
-	 * return the string at the index.
-	 * @param inputstr - array of strings retrived from database row
-	 * @param index - integer location of target string
-	 * @return strresult - the target string to parse
-	 */
-	public String[] getRowAtIndex(ArrayList<String[]> inputstr, int index)
-	{
-		String strresult[] = inputstr.get(index);		
-		return strresult;
-	}
-	
 	/**
 	 * getStringAtIndex - using the given String array and index number,
 	 * return the string at the index.
