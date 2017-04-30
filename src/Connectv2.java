@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Scanner;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.DriverManager;
@@ -27,7 +28,7 @@ public class Connect
 	 */
 	public String[] connectSelect(String SQLQuery)
 	{
-		String[] arr = null;
+		String[] arr;
 		try
 		{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -45,15 +46,29 @@ public class Connect
             ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
             int columns = rsmd.getColumnCount();
             arr = new String[columns];
+            // result += "Select Stmt Result for Table:\n";
+            // String columnNames = "";
+            // for (int i=1; i<=columns; i++)
+            // {
+            //     columnNames += rsmd.getColumnLabel(i) + "\t";
+            // }
 
+            // arr[0] = columnNames;
+            // result += columnNames + "\n";
+            // result += "============================\n";
+
+            String items = "";
             while (resultSet.next())
             {
                 for (int i=1; i<=columns; i++)
                 {
-                	arr[i-1] = resultSet.getString(i); //store each item as elem, offset-1 because columns start at 1
+                	arr[i-1] = resultSet.getString(i); //store each item as elem, offset-1
+                	// items += resultSet.getString(i) + "\t"; //each col. item, tabbed
+                    // result += resultSet.getString(i) + "\t"; //each col. item, tabbed
                 }
 
             }
+            // arr[1] = items;
 
             connection.close();
             statement.close();
@@ -64,6 +79,27 @@ public class Connect
 		{
 			e.printStackTrace();
 		}
+
+		// try
+		// {
+		// 	connection = DriverManager.getConnection(connectionString);
+		// 	Statement statement = connection.createStatement();
+		// 	ResultSet resultSet = statement.executeQuery(SQLQuery);
+		// 	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		// 	ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+			
+		// 	//perform actions, store data...
+		// 	arr = new String[]{"1","2","3"}; //TEST
+			
+		// 	connection.close();
+  //           statement.close();
+  //           resultSet.close();
+		// }
+		
+		// catch (Exception e)
+		// {
+		// 	e.printStackTrace();
+		// }
 		
 		return arr;
 	}
@@ -115,65 +151,17 @@ public class Connect
 		this.connectionString = connectionString;
 	}
 
-	/**
-	 * getStringAtIndex - using the given String array and index number,
-	 * return the string at the index.
-	 * @param inputstr - array of strings retrived from database row
-	 * @param index - integer location of target string
-	 * @return strresult - the target string to parse
-	 */
-	public String getStringAtIndex(String[] inputstr, int index)
+	public int[] parseIntsFromResult(String inputstr)
+	{
+		int[] intresult = new int[]{1,2,3}; //TEST
+		// NEED to be able to test set of ints from varchar,
+		// such as '1,2,3' --> (1,2,3)
+		return intresult;
+	}
+
+	public String parseStrFromResult(String[] inputstr, int index)
 	{
 		String strresult = inputstr[index];		
 		return strresult;
-	}
-	
-	/**
-	 * parseIntsFromResult - With inputstr from database row,
-	 * parse the specific integers from the String and place
-	 * into an array of actual integers.
-	 * @param inputstr - the database row, as String
-	 * @return intresult - array of int
-	 */
-	public int[] parseIntsFromResult(String inputstr)
-	{
-		// 1) Initialize temp Int array to total length of String
-		// and check each character in String if it is a valid number
-		int[] inttemp = new int[inputstr.length()];
-		int intcount = 0;
-		for (int i=0; i<inputstr.length(); i++)
-		{
-			char temp = inputstr.charAt(i);
-			boolean isNumber = Character.isDigit(temp);
-			if (isNumber)
-			{
-				intcount +=1;
-				inttemp[i] = Character.getNumericValue(temp);
-			}
-			
-			else
-			{
-				inttemp[i] = -1;
-			}
-		}
-		
-		// 2) Initialize actual result Int array, from number of valid digits
-		// recorded above, and place those ints in the new array, in correct order.
-		int[] intresult = new int[intcount];
-		int tempcount = 0;
-		for (int i=0; i<inttemp.length; i++)
-		{
-			if (inttemp[i] < 0)
-			{
-				continue;
-			}
-			
-			else
-			{
-				intresult[tempcount] = inttemp[i];
-				tempcount +=1;
-			}
-		}
-		return intresult;
 	}
 }
