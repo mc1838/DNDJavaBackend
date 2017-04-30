@@ -20,6 +20,16 @@ public class Connect
 	 */
 	String connectionString = "";
 	Connection connection = null;
+
+	/**
+	 * Constructor, which sets up the connectionstring
+	 * to use. Can be re-set again later.
+	 * @param connectionString - the string which determines which server/db to use and how
+	 */
+	public Connect(String connectionString) {
+		super();
+		this.connectionString = connectionString;
+	}
 	
 	/**
 	 * connectSelect - used for Select statements and 
@@ -28,13 +38,15 @@ public class Connect
 	 * Can use the ResultSet to retrieve and store data!
 	 * @param SQLQuery - the specified SQL Select statement
 	 */
-	public String[] connectSelect(String SQLQuery)
+	public ArrayList<String[]> connectSelect(String SQLQuery)
 	{
 		// Allow all forms of Networking threading
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-		String[] arr = null;
+        ArrayList<String[]> result = new ArrayList<String[]>();
+
+		// 1) Establish initial connection
 		try
 		{
 			Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
@@ -47,20 +59,21 @@ public class Connect
             Toast.makeText(this, "getC "+ e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 
+		// 2) Grab results from DB and store in 2D array
 		try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SQLQuery))
         {
             ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
             int columns = rsmd.getColumnCount();
-            arr = new String[columns];
 
             while (resultSet.next())
             {
-                for (int i=1; i<=columns; i++)
-                {
-                	arr[i-1] = resultSet.getString(i); //store each item as elem, offset-1 because columns start at 1
-                }
-
+            	String[] row = new String[columns];
+            	for (int i=1; i<=columns; i++)
+            	{
+            		row[i-1] = resultSet.getString(i);
+            	}
+            	result.add(row);
             }
 
             connection.close();
@@ -74,7 +87,7 @@ public class Connect
             Toast.makeText(this, "exec " + e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
 
-		return arr;
+		return result;
 	}
 	
 	/**
@@ -128,6 +141,19 @@ public class Connect
 	 */
 	public void setConnectionString(String connectionString) {
 		this.connectionString = connectionString;
+	}
+
+	/**
+	 * getStringAtIndex - using the given String array and index number,
+	 * return the string at the index.
+	 * @param inputstr - array of strings retrived from database row
+	 * @param index - integer location of target string
+	 * @return strresult - the target string to parse
+	 */
+	public String[] getRowAtIndex(ArrayList<String[]> inputstr, int index)
+	{
+		String strresult[] = inputstr.get(index);		
+		return strresult;
 	}
 
 	/**
