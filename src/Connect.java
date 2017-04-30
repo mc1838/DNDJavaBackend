@@ -1,7 +1,6 @@
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Scanner;
-//import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.DriverManager;
@@ -10,6 +9,7 @@ import java.sql.DriverManager;
  * @author Maxwell Crawford
  * Connect module for Java/JDBC to MSSQL backend.
  * Has support for basic executeQuery/execute statements.
+ * DESKTOP JAVA version!
  */
 public class Connect 
 {
@@ -20,105 +20,113 @@ public class Connect
 	Connection connection = null;
 	
 	/**
-	 * executeReturn - used for Select statements and 
+	 * connectSelect - used for Select statements and 
 	 * queries which return some 'ResultSet'.
 	 * 
 	 * Can use the ResultSet to retrieve and store data!
 	 * @param SQLQuery - the specified SQL Select statement
 	 */
-	public String[] executeReturn(String SQLQuery, String[] arr)
+	public String[] connectSelect(String SQLQuery)
 	{
+		String[] arr;
 		try
 		{
-			connection = DriverManager.getConnection(connectionString);
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(SQLQuery);
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
-			
-			//perform actions, store data...
-			arr = new String[]{"1","2","3"}; //TEST
-			
-			connection.close();
-            statement.close();
-            resultSet.close();
+			connection = DriverManager.getConnection(connectionString);
 		}
-		
+
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		return arr;
-	}
-	
-	public int[] executeReturn(String SQLQuery, int[] arr)
-	{
-		try
-		{
-			connection = DriverManager.getConnection(connectionString);
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(SQLQuery);
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
-			
-			//perform actions, store data...
-			arr = new int[]{1,2,3}; //TEST
-			
-			connection.close();
+
+		try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQLQuery))
+        {
+            ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+            int columns = rsmd.getColumnCount();
+            arr = new String[columns];
+            // result += "Select Stmt Result for Table:\n";
+            // String columnNames = "";
+            // for (int i=1; i<=columns; i++)
+            // {
+            //     columnNames += rsmd.getColumnLabel(i) + "\t";
+            // }
+
+            // arr[0] = columnNames;
+            // result += columnNames + "\n";
+            // result += "============================\n";
+
+            String items = "";
+            while (resultSet.next())
+            {
+                for (int i=1; i<=columns; i++)
+                {
+                	arr[i-1] = resultSet.getString(i); //store each item as elem, offset-1
+                	// items += resultSet.getString(i) + "\t"; //each col. item, tabbed
+                    // result += resultSet.getString(i) + "\t"; //each col. item, tabbed
+                }
+
+            }
+            // arr[1] = items;
+
+            connection.close();
             statement.close();
             resultSet.close();
-		}
-		
-		catch (Exception e)
+        }
+
+        catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
-		return arr;
-	}
-	
-	public int executeReturn(String SQLQuery, int arr)
-	{
-		try
-		{
-			connection = DriverManager.getConnection(connectionString);
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(SQLQuery);
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
+
+		// try
+		// {
+		// 	connection = DriverManager.getConnection(connectionString);
+		// 	Statement statement = connection.createStatement();
+		// 	ResultSet resultSet = statement.executeQuery(SQLQuery);
+		// 	Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		// 	ResultSetMetaData rsmd = resultSet.getMetaData(); //needed for column data/indices
 			
-			//perform actions, store data...
-			arr = 2; //TEST
+		// 	//perform actions, store data...
+		// 	arr = new String[]{"1","2","3"}; //TEST
 			
-			connection.close();
-            statement.close();
-            resultSet.close();
-		}
+		// 	connection.close();
+  //           statement.close();
+  //           resultSet.close();
+		// }
 		
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		// catch (Exception e)
+		// {
+		// 	e.printStackTrace();
+		// }
 		
 		return arr;
 	}
 	
 	/**
-	 * execute - Used for Insert/Update/Delete and other
+	 * connectExecute - Used for Insert/Update/Delete and other
 	 * statements which execute an action, but don't return data.
 	 * 
 	 * @param SQLQuery - the specified SQL statement for execution
 	 */
-	public void execute(String SQLQuery)
+	public void connectExecute(String SQLQuery)
 	{
 		try
 		{
-			connection = DriverManager.getConnection(connectionString); //for testdb
-            Statement exstatement = connection.createStatement(); //NOTE: need execute type stmt for non-selects
+			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			connection = DriverManager.getConnection(connectionString);
+		}
+
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		try (Statement exstatement = connection.createStatement())
+		{
             exstatement.execute(SQLQuery);
             
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             exstatement.close();
             connection.close();
 		}
@@ -141,5 +149,19 @@ public class Connect
 	 */
 	public void setConnectionString(String connectionString) {
 		this.connectionString = connectionString;
+	}
+
+	public int[] parseIntsFromResult(String inputstr)
+	{
+		int[] intresult = new int[]{1,2,3}; //TEST
+		// NEED to be able to test set of ints from varchar,
+		// such as '1,2,3' --> (1,2,3)
+		return intresult;
+	}
+
+	public String parseStrFromResult(String[] inputstr, int index)
+	{
+		String strresult = inputstr[index];		
+		return strresult;
 	}
 }
